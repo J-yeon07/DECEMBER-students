@@ -4,7 +4,7 @@ import streamlit as st
 st.set_page_config(page_title="세특 자동 생성기", page_icon="📝", layout="wide")
 
 # ---------------------------------------------------------
-# 1. 데이터베이스 구축 (이미지 내용을 그대로 옮겼습니다)
+# 1. 데이터베이스 (내용은 동일합니다)
 # ---------------------------------------------------------
 data = {
     "1차: 모둠 활동 (태도와 실천)": {
@@ -51,55 +51,54 @@ data = {
 }
 
 # ---------------------------------------------------------
-# 2. 앱 화면 구성 (UI)
+# 2. 메인 화면 로직
 # ---------------------------------------------------------
 def main():
     st.title("🏫 2025 자유학기 주제선택 특기사항 문구 생성 도우미")
-    st.markdown("학생의 **활동별 성취수준(A~I)**을 선택하면, 내용을 수합하고 **유사 버전 생성 프롬프트**를 만들어줍니다.")
+    st.markdown("학생의 **활동별 성취수준(A~I)**을 선택하면, 종합 문구와 **AI 변형 명령어**를 생성합니다.")
     
     st.divider()
 
-    # 화면을 좌우로 나눔 (왼쪽: 선택, 오른쪽: 결과)
+    # 화면 레이아웃 (좌: 입력 / 우: 결과)
     col1, col2 = st.columns([1, 1.2])
 
     with col1:
         st.subheader("📌 수준 선택")
-        st.info("각 활동에 대한 학생의 수준을 선택하세요.")
+        st.info("학생의 활동 수준을 선택해주세요.")
         
         selections = {}
         
-        # 반복문으로 선택지 생성
+        # 데이터 기반으로 선택 박스 생성
         for category, options in data.items():
-            # Selectbox 라벨과 옵션 설정
             option_keys = list(options.keys())
             selected_key = st.selectbox(f"**{category}**", option_keys, index=0)
-            
-            # 선택된 문장 저장
             selections[category] = options[selected_key]
             
-            # 선택한 내용 미리보기 (작은 글씨)
+            # 선택한 문장 미리보기
             st.caption(f"└ {options[selected_key]}")
-            st.write("") # 간격 띄우기
+            st.write("") 
 
     with col2:
         st.subheader("📄 결과 확인")
         
-        # 버튼을 누르면 결과 생성
+        # '문구 생성하기' 버튼
         if st.button("문구 생성하기", type="primary"):
             
             # 1. 문장 합치기
             full_text = " ".join(selections.values())
             
-            st.success("✅ [종합본] 성취수준 수합 결과")
-            st.text_area("복사해서 사용하세요", full_text, height=150)
+            st.success("✅ [결과 1] 성취수준 종합본")
+            st.markdown("박스 우측 상단의 **복사 아이콘(📄)**을 클릭하세요.")
+            # st.code를 사용하면 자동으로 복사 버튼이 생깁니다.
+            st.code(full_text, language='text')
             
             st.divider()
             
-            # 2. AI 변형 버전 요청용 프롬프트 생성
-            st.warning("🤖 [AI 기능] 유사 버전 2개 만들기")
+            # 2. AI 프롬프트 생성
+            st.warning("🤖 [결과 2] AI 변형 생성 명령어")
             st.markdown("""
-            아래 **'AI 명령어'**를 복사해서 **ChatGPT**나 **Gemini** 채팅창에 붙여넣으세요.
-            자동으로 **비슷한 어투와 길이의 다른 문장 2개**를 만들어줍니다.
+            아래 내용을 복사하여 **ChatGPT**나 **Gemini**에 붙여넣으면,  
+            **유사한 어조의 새로운 문장 2개**를 만들어줍니다.
             """)
             
             prompt_text = f"""
@@ -110,6 +109,7 @@ def main():
 [원본 내용]
 {full_text}
 """
+            # 복사 버튼이 있는 코드 블록으로 출력
             st.code(prompt_text, language='text')
 
 if __name__ == "__main__":
